@@ -168,6 +168,22 @@ int Options::setOption(StringOption option, const string& value)
         stringOptions[STEP_SIZING] = stepSizingWords[i];
         break;
 
+    case HYD_SOLVER:
+        if ( Utilities::match(value, "RWCGGA") || Utilities::match(value, "GGA") )
+        {
+            stringOptions[HYD_SOLVER] = "GGA";
+            break;
+        }
+        return InputError::INVALID_KEYWORD;
+
+    case MATRIX_SOLVER:
+        if ( Utilities::match(value, "SPARSPAK") )
+        {
+            stringOptions[MATRIX_SOLVER] = "SPARSPAK";
+            break;
+        }
+        return InputError::INVALID_KEYWORD;
+
     case DEMAND_MODEL:
         i = Utilities::findFullMatch(value, demandModelWords);
         if (i < 0) return InputError::INVALID_KEYWORD;
