@@ -80,12 +80,20 @@ void Network::clear()
 
     memPool->reset();
 
+    // ... clear title, ID lookup tables, and message log
+
+    title.clear();
+    nodeTable.clear();
+    linkTable.clear();
+    patternTable.clear();
+    curveTable.clear();
+    controlTable.clear();
+    msgLog.str("");
+    msgLog.clear();
+
     // ... re-set all options to their default values
 
     options.setDefaults();
-
-    // ... delete the contents of the message log
-    //msgLog.str("");
 }
 
 //-----------------------------------------------------------------------------
@@ -140,7 +148,9 @@ int Network::indexOf(Element::ElementType eType, const string& name)
 
 Node* Network::node(const string& name)
 {
-    return static_cast<Node*>(nodeTable.find(name)->second);
+    auto it = nodeTable.find(name);
+    if ( it == nodeTable.end() ) return nullptr;
+    return static_cast<Node*>(it->second);
 }
 
 Node* Network::node(const int index)
@@ -152,7 +162,9 @@ Node* Network::node(const int index)
 
 Link* Network::link(const string& name)
 {
-    return static_cast<Link*>(linkTable.find(name)->second);
+    auto it = linkTable.find(name);
+    if ( it == linkTable.end() ) return nullptr;
+    return static_cast<Link*>(it->second);
 }
 
 Link* Network::link(const int index)
@@ -164,7 +176,9 @@ Link* Network::link(const int index)
 
 Pattern* Network::pattern(const string& name)
 {
-    return static_cast<Pattern*>(patternTable.find(name)->second);
+    auto it = patternTable.find(name);
+    if ( it == patternTable.end() ) return nullptr;
+    return static_cast<Pattern*>(it->second);
 }
 
 Pattern* Network::pattern(const int index)
@@ -176,7 +190,9 @@ Pattern* Network::pattern(const int index)
 
 Curve* Network::curve(const string& name)
 {
-    return static_cast<Curve*>(curveTable.find(name)->second);
+    auto it = curveTable.find(name);
+    if ( it == curveTable.end() ) return nullptr;
+    return static_cast<Curve*>(it->second);
 }
 
 Curve* Network::curve(const int index)
@@ -188,7 +204,9 @@ Curve* Network::curve(const int index)
 
 Control*  Network::control(const string& name)
 {
-    return static_cast<Control*>(controlTable.find(name)->second);
+    auto it = controlTable.find(name);
+    if ( it == controlTable.end() ) return nullptr;
+    return static_cast<Control*>(it->second);
 }
 
 Control* Network::control(const int index)
