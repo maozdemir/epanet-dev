@@ -60,6 +60,10 @@ static const char* deprecatedKeywords[] =
     {"SEGMENTS", "VERIFY", "CHECKFREQ", "MAXCHECK", "DAMPLIMIT",
      "HTOL", "QTOL", "RQTOL", 0};
 
+// ... currently ignored compatibility keywords found in some EPANET variants
+static const char* ignoredKeywords[] =
+    {"VALVE_REP_TYPE", "TEMP_DISC_PARA", 0};
+
 // ... Single keywords (for EPANET2 compatibility)
 static const char* epanet2Keywords[] =
     {"UNITS", "PRESSURE", "HEADLOSS", "HYDRAULICS", "QUALITY", "VISCOSITY",
@@ -89,6 +93,13 @@ static const char* w_LIMITING = "LIMITING";
 static const char* w_ROUGHNESS = "ROUGHNESS";
 //static const char* w_NONE = "NONE";
 
+static const char* w_AVERAGE = "AVERAGE";
+static const char* w_MINIMUM = "MINIMUM";
+static const char* w_MAXIMUM = "MAXIMUM";
+static const char* w_RANGE = "RANGE";
+static const char* w_SERIES = "SERIES";
+static const char* w_NONE = "NONE";
+
 //-----------------------------------------------------------------------------
 
 OptionParser::OptionParser()
@@ -117,6 +128,18 @@ void OptionParser::parseOption(Network* network, vector<string>& tokenList)
     // ... check for deprecated keywords
     if ( Utilities::findFullMatch(s1, deprecatedKeywords) >= 0 ) return;
 
+    // ... ignore recognized compatibility keywords that have no effect here
+    if ( Utilities::findFullMatch(s1, ignoredKeywords) >= 0 ) return;
+
+    // ... accept QUALITY_MODEL as an alias for the EPANET2 QUALITY option
+    if ( s1 == "QUALITY_MODEL" )
+    {
+        if ( tokenList.size() == 2 ) value = "";
+        else value = tokens[2];
+        parseQualOption(s2, value, network);
+        return;
+    }
+
     // ... check for EPANET2 "QUALITY" keyword which requires special processing
     if ( s1.compare(w_QUALITY) == 0 )
     {
@@ -127,6 +150,8 @@ void OptionParser::parseOption(Network* network, vector<string>& tokenList)
 
     // ... get the equivalent EPANET3 keyword
     keyword = getEpanet3Keyword(s1, s2, value);
+
+    if ( keyword == "HYD_SOLVER" ) keyword = "HYDRAULIC_SOLVER";
 
     // ... set the appropriate option to the parsed value
     if ( !value.empty() ) setOption(keyword, value, network);
@@ -208,9 +233,24 @@ void OptionParser::parseTimeOption(Network* network, vector<string>& tokenList)
     int option = Utilities::findFullMatch(keyword, timeOptionKeywords);
     if ( option < 0 ) throw InputError(InputError::INVALID_KEYWORD, keyword);
 
-    // ... skip STATISTIC option
+    // ... parse STATISTIC option
 
-    if (option == Options::REPORT_STATISTIC) return;
+    if (option == Options::REPORT_STATISTIC)
+    {
+        if ( i >= nTokens ) throw InputError(InputError::TOO_FEW_ITEMS, "");
+        int statistic = 0;
+        if ( Utilities::match(tokens[i], w_AVERAGE) ) statistic = 1;
+        else if ( Utilities::match(tokens[i], w_MINIMUM) ) statistic = 2;
+        else if ( Utilities::match(tokens[i], w_MAXIMUM) ) statistic = 3;
+        else if ( Utilities::match(tokens[i], w_RANGE) ) statistic = 4;
+        else if ( !Utilities::match(tokens[i], w_SERIES) &&
+                  !Utilities::match(tokens[i], w_NONE) )
+        {
+            throw InputError(InputError::INVALID_KEYWORD, tokens[i]);
+        }
+        network->options.setOption((Options::TimeOption)option, statistic);
+        return;
+    }
 
     // ... create strings to hold a time value and its units
 

@@ -373,6 +373,7 @@ void parseValveData(Valve* valve, Network* network, vector<string>& tokenList)
 
     if ( tokenList.size() < 6 ) throw InputError(InputError::TOO_FEW_ITEMS, "");
     string* tokens = &tokenList[0];
+    int nTokens = static_cast<int>(tokenList.size());
 
     // ... read diameter
 
@@ -384,36 +385,48 @@ void parseValveData(Valve* valve, Network* network, vector<string>& tokenList)
 
     // ... read valve type
 
+    string valveTypeToken = Utilities::upperCase(tokens[4]);
+    int settingIndex = 5;
     int vType = Utilities::findMatch(tokens[4], valveTypeWords);
-    if ( vType < 0 ) throw InputError(InputError::INVALID_KEYWORD, tokens[4]);
-    valve->valveType = (Valve::ValveType)vType;
+    if ( vType >= 0 )
+    {
+        valve->valveType = (Valve::ValveType)vType;
+    }
+    else if ( Utilities::match(valveTypeToken, "DPRV") )
+    {
+        valve->valveType = Valve::PRV;
+        if ( nTokens > 6 ) settingIndex = 6;
+    }
+    else throw InputError(InputError::INVALID_KEYWORD, tokens[4]);
+
+    if ( settingIndex >= nTokens ) throw InputError(InputError::TOO_FEW_ITEMS, "");
 
     // ... read index of head loss curve for General Purpose Valve
 
     if ( valve->valveType == Valve::GPV )
     {
-        int c = network->indexOf(Element::CURVE, tokens[5]);
-        if ( c < 0 ) throw InputError(InputError::UNDEFINED_OBJECT, tokens[5]);
+        int c = network->indexOf(Element::CURVE, tokens[settingIndex]);
+        if ( c < 0 ) throw InputError(InputError::UNDEFINED_OBJECT, tokens[settingIndex]);
         valve->initSetting = c;
     }
 
     // ... read numerical setting for other types of valves
     else
     {
-        if ( !Utilities::parseNumber(tokens[5], valve->initSetting) )
+        if ( !Utilities::parseNumber(tokens[settingIndex], valve->initSetting) )
         {
-            throw InputError(InputError::INVALID_NUMBER, tokens[5]);
+            throw InputError(InputError::INVALID_NUMBER, tokens[settingIndex]);
         }
     }
 
     // ... read optional minor loss coeff.
 
-    if ( tokenList.size() > 6 )
+    if ( nTokens > settingIndex + 1 )
     {
-        if ( !Utilities::parseNumber(tokens[6], valve->lossCoeff) ||
+        if ( !Utilities::parseNumber(tokens[settingIndex + 1], valve->lossCoeff) ||
              valve->lossCoeff < 0.0 )
         {
-            throw InputError(InputError::INVALID_NUMBER, tokens[6]);
+            throw InputError(InputError::INVALID_NUMBER, tokens[settingIndex + 1]);
         }
     }
 }

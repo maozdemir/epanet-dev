@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 2.8)
+cmake_minimum_required (VERSION 3.5)
 SET (EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
 SET (LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
 
@@ -48,6 +48,7 @@ src/Elements/valve.cpp
 src/Input/controlparser.cpp
 src/Input/curveparser.cpp
 src/Input/inputparser.cpp
+src/Input/jsoninputreader.cpp
 src/Input/inputreader.cpp
 src/Input/linkparser.cpp
 src/Input/nodeparser.cpp
@@ -60,6 +61,7 @@ src/Models/pumpenergy.cpp
 src/Models/qualmodel.cpp
 src/Models/tankmixmodel.cpp
 src/Output/outputfile.cpp
+src/Output/jsonprojectwriter.cpp
 src/Output/projectwriter.cpp
 src/Output/reportfields.cpp
 src/Output/reportwriter.cpp
@@ -108,6 +110,7 @@ src/Elements/valve.h
 src/Input/controlparser.h
 src/Input/curveparser.h
 src/Input/inputparser.h
+src/Input/jsoninputreader.h
 src/Input/inputreader.h
 src/Input/linkparser.h
 src/Input/nodeparser.h
@@ -120,6 +123,7 @@ src/Models/pumpenergy.h
 src/Models/qualmodel.h
 src/Models/tankmixmodel.h
 src/Output/outputfile.h
+src/Output/jsonprojectwriter.h
 src/Output/projectwriter.h
 src/Output/reportfields.h
 src/Output/reportwriter.h

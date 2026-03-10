@@ -10,14 +10,35 @@
 
 #include "epanet3.h"
 
+#include <cstring>
 #include <iostream>
 
 int main(int argc, char* argv[])
 {
+    if ( argc == 4 &&
+        ( std::strcmp(argv[1], "--convert-json") == 0 ||
+          std::strcmp(argv[1], "convert-json") == 0 ) )
+    {
+        EN_Project p = EN_createProject();
+        int err = EN_loadProject(argv[2], p);
+        if ( !err ) err = EN_saveProject(argv[3], p);
+        EN_deleteProject(p);
+
+        if ( err )
+        {
+            std::cout << "\nJSON conversion failed.\n";
+            return err;
+        }
+
+        std::cout << "\nCreated JSON file: " << argv[3] << "\n";
+        return 0;
+    }
+
     //... check number of command line arguments
     if (argc < 3)
     {
         std::cout << "\nCorrect syntax is: epanet3 inpFile rptFile (outFile)\n";
+        std::cout << "   or: epanet3 --convert-json input.inp output.json\n";
         return 0;
     }
 

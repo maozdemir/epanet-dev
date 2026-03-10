@@ -13,6 +13,7 @@
 #include "Core/error.h"
 #include "Core/diagnostics.h"
 #include "Input/inputreader.h"
+#include "Output/jsonprojectwriter.h"
 #include "Output/projectwriter.h"
 #include "Output/reportwriter.h"
 #include "Utilities/utilities.h"
@@ -20,6 +21,18 @@
 #include <cstring>
 #include <fstream>
 using namespace std;
+
+namespace
+{
+    bool hasFileExtension(const char* fname, const string& ext)
+    {
+        if ( fname == nullptr ) return false;
+        string name = Utilities::upperCase(fname);
+        string suffix = Utilities::upperCase(ext);
+        if ( name.size() < suffix.size() ) return false;
+        return name.compare(name.size() - suffix.size(), suffix.size(), suffix) == 0;
+    }
+}
 
 //-----------------------------------------------------------------------------
 
@@ -107,9 +120,19 @@ namespace Epanet
         try
         {
             if ( networkEmpty ) return 0;
-            ProjectWriter projectWriter;
-            projectWriter.writeFile(fname, &network);
-            return 0;
+
+            int err = 0;
+            if ( hasFileExtension(fname, ".json") || hasFileExtension(fname, ".jsn") )
+            {
+                JsonProjectWriter projectWriter;
+                err = projectWriter.writeFile(fname, &network);
+            }
+            else
+            {
+                ProjectWriter projectWriter;
+                err = projectWriter.writeFile(fname, &network);
+            }
+            return err;
         }
         catch (ENerror const& e)
         {

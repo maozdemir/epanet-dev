@@ -7,6 +7,7 @@
 
 #include "inputreader.h"
 #include "inputparser.h"
+#include "jsoninputreader.h"
 #include "Core/network.h"
 #include "Core/error.h"
 #include "Utilities/utilities.h"
@@ -54,6 +55,7 @@ void InputReader::readFile(const char* inpFile, Network* network)
 {
     // ... initialize current input section
 
+    errcount = 0;
     section = -1;
 
     // ... open the input file
@@ -62,6 +64,16 @@ void InputReader::readFile(const char* inpFile, Network* network)
     if (!fin.is_open()) throw FileError(FileError::CANNOT_OPEN_INPUT_FILE);
     try
     {
+        if ( JsonInputReader::isJsonInput(inpFile, fin) )
+        {
+            JsonInputReader::readFile(fin, network);
+            fin.close();
+            return;
+        }
+
+        fin.clear();
+        fin.seekg(0, ios::beg);
+
         // ... parse object names from the file
 
         ObjectParser objectParser(network);
