@@ -17,6 +17,7 @@
 #include <vector>
 
 class HydSolver;
+class Node;
 
 //! \class GGASolver
 //! \brief A hydraulic solver based on Todini's Global Gradient Algorithm.
@@ -59,6 +60,7 @@ class GGASolver : public HydSolver
     void   setLinkCoeffs();
     void   setNodeCoeffs();
     void   setValveCoeffs();
+    double findFixedGradeControlNodeOutflow(Node* node);
 
     // Functions that update the hydraulic solution
     int    findHeadChanges();

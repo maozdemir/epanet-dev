@@ -1,5 +1,7 @@
 ﻿# epanet-dev
 
+# epanet-dev
+
 [![Build Status](https://api.travis-ci.org/OpenWaterAnalytics/epanet-dev.svg)](https://travis-ci.org/OpenWaterAnalytics/epanet-dev)
 
 This is a collaborative project to develop a new version of the EPANET computational engine for analyzing water distribution systems.
@@ -17,13 +19,18 @@ The source code can be compiled as both a shared library and a command-line exec
 To build using CMake on Linux/Mac:
 
 ```sh
+
+```sh
 mkdir build && cd build
 cmake .. && make
 ```
 
+
 The shared library (`libepanet3.so`) will be found in the `/lib` sub-directory and the command-line executable (`run-epanet3`) will be in the `/bin` sub-directory.
 
 To build using CMake on Windows with Visual Studio:
+
+```sh
 
 ```sh
 mkdir build && cd build
@@ -33,7 +40,11 @@ cmake --build . --config Release
 
 where `n yyyy` is the version and year of the Visual Studio release to use (e.g., 16 2019). Both the shared library (`epanet3.dll`) and the command-line executable (`run-epanet3.exe`) will be found in the `\bin\Release` sub-directory as will an `epanet3.lib` file needed to build applications that link to the library.
 
+where `n yyyy` is the version and year of the Visual Studio release to use (e.g., 16 2019). Both the shared library (`epanet3.dll`) and the command-line executable (`run-epanet3.exe`) will be found in the `\bin\Release` sub-directory as will an `epanet3.lib` file needed to build applications that link to the library.
+
 To build using CMake on Windows with MinGW:
+
+```sh
 
 ```sh
 mkdir build && cd build
@@ -41,17 +52,24 @@ cmake -G "MinGW Makefiles" ..
 cmake --build .
 ```
 
+
 Both the shared library (`libepanet3.dll`) and the command-line executable (`run-epanet3.exe`) will be found in the `\bin` sub-directory.
 
 ## Running EPANET 3
 
+
 To run the command line executable under Linux/Mac enter the following command from a terminal window:
+
+```sh
 
 ```sh
 ./run-epanet3 input.inp report.txt
 ```
 
+
 where `input.inp` is the name of a properly formatted EPANET input file and `report.txt` is the name of a plain text file where results will be written. For Windows  , enter the following command in a Command Prompt window:
+
+```sh
 
 ```sh
 run-epanet3 input.inp report.txt

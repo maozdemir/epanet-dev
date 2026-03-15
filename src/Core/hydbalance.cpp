@@ -19,6 +19,7 @@
 
 #include <cmath>
 #include <cstring>
+#include <vector>
 using namespace std;
 
 void   findNodeOutflows(double lamda, double dH[], double xQ[], Network* nw);
@@ -163,6 +164,25 @@ void findNodeOutflows(double lamda, double dH[], double xQ[], Network* nw)
     // ... add emitter flows and demands to node outflows
 
     int nodeCount = nw->count(Element::NODE);
+    vector<bool> activeControlValveNodes(nodeCount, false);
+
+    for (Link* link : nw->links)
+    {
+        if ( link->status != Link::VALVE_ACTIVE ) continue;
+
+        if ( link->isPRV() && link->toNode )
+        {
+            int index = link->toNode->index;
+            if ( index >= 0 && index < nodeCount ) activeControlValveNodes[index] = true;
+        }
+
+        if ( link->isPSV() && link->fromNode )
+        {
+            int index = link->fromNode->index;
+            if ( index >= 0 && index < nodeCount ) activeControlValveNodes[index] = true;
+        }
+    }
+
     for (int i = 0; i < nodeCount; i++)
     {
         Node* node = nw->node(i);
@@ -186,7 +206,11 @@ void findNodeOutflows(double lamda, double dH[], double xQ[], Network* nw)
             // ... for fixed grade junction, demand is remaining flow excess
             if ( node->fixedGrade )
             {
-                q = xQ[i];
+                if ( activeControlValveNodes[i] )
+                {
+                    q = node->findActualDemand(nw, h, dqdh);
+                }
+                else q = xQ[i];
                 xQ[i] -= q;
             }
 
