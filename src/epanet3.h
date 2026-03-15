@@ -165,6 +165,15 @@ enum InitFlowTypes {
     EN_NOINITFLOW,   //0
     EN_INITFLOW};    //1
 
+enum IrrigationOptionTypes {
+    EN_IRR_ALLOW_SEGMENTED,    //0
+    EN_IRR_MIN_PRESSURE,       //1
+    EN_IRR_MIN_VELOCITY,       //2
+    EN_IRR_MAX_VELOCITY,       //3
+    EN_IRR_MIN_SEGMENT_LENGTH, //4
+    EN_IRR_MAX_SEGMENTS,       //5
+    EN_IRR_DETAILED_REPORT};   //6
+
 
 #ifdef __cplusplus
 extern "C" {
@@ -172,6 +181,15 @@ extern "C" {
 
 int        EN_getVersion(int *);
 int        EN_runEpanet(const char* inpFile, const char* rptFile, const char* outFile);
+int        EN_optimizeIrrigation(const char* inpFile,
+                                 const char* configFile,
+                                 const char* rptFile,
+                                 const char* savedInpFile);
+int        EN_optimizeIrrigationProject(const char* configFile,
+                                        const char* savedInpFile,
+                                        EN_Project p);
+int        EN_setIrrigationOption(int option, double value, EN_Project p);
+int        EN_getIrrigationOption(int option, double* value, EN_Project p);
 
 EN_Project EN_createProject();
 int        EN_cloneProject(EN_Project pClone, EN_Project pSource);
