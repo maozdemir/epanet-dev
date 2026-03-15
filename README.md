@@ -10,6 +10,10 @@ This project seeks to develop a new version of the EPANET computational engine a
 
 EPANET was originally developed by the U.S. Environmental Protection Agency (USEPA) and placed in the public domain. The latest official version (2.2) can be found [here (epa.gov)](https://www.epa.gov/water-research/epanet). The new version being developed by this project represents an independent effort that is part of the [Open Source EPANET Initiative](http://community.wateranalytics.org/t/announcement-of-an-open-source-epanet-initiative/117) and is neither supported nor endorsed by USEPA.
 
+## Recent Solver Update
+
+The hydraulic solver now accounts for outflow at fixed-grade junctions that act as active pressure control valve nodes. For active pressure reducing valves (PRVs) and pressure sustaining valves (PSVs), emitter flow and pressure-dependent demand at the control node are included in both the nodal outflow balance and the valve coefficient assembly. This improves convergence and reduces oscillatory behavior in control-valve stress cases.
+
 ## Building EPANET 3
 
 The source code can be compiled as both a shared library and a command-line executable. Any C++ compiler that supports the C++11 language standard can be used.
