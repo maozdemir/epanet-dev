@@ -583,6 +583,26 @@ void  GGASolver::setNodeCoeffs()
 
 //  Compute matrix coefficients for pressure regulating valves.
 
+double GGASolver::findFixedGradeControlNodeOutflow(Node* node)
+{
+    if ( !network || !node || !node->fixedGrade || node->type() != Node::JUNCTION )
+    {
+        return 0.0;
+    }
+
+    double h = node->head;
+    double q = 0.0;
+    double dqdh = 0.0;
+
+    q += node->findEmitterFlow(h, dqdh);
+    q += node->findActualDemand(network, h, dqdh);
+    return q;
+}
+
+//-----------------------------------------------------------------------------
+
+//  Compute matrix coefficients for pressure regulating valves.
+
 void  GGASolver::setValveCoeffs()
 {
     for (Link* link : network->links)
@@ -591,16 +611,21 @@ void  GGASolver::setValveCoeffs()
 
         if ( link->hGrad > 0.0 ) continue;
 
+        Node* fromNode = link->fromNode;
+        Node* toNode = link->toNode;
+        if ( !fromNode || !toNode ) continue;
+
         // ... determine end node indexes of link
 
-        int n1 = link->fromNode->index;
-        int n2 = link->toNode->index;
+        int n1 = fromNode->index;
+        int n2 = toNode->index;
 
         // ... add net inflow of downstream node of a PRV to the
         //     r.h.s. row of its upstream node
 
         if ( link->isPRV() )
         {
+            xQ[n2] -= findFixedGradeControlNodeOutflow(toNode);
             matrixSolver->addToRhs(n1, (double)xQ[n2]);
         }
 
@@ -609,6 +634,7 @@ void  GGASolver::setValveCoeffs()
 
         if ( link->isPSV() )
         {
+            xQ[n1] -= findFixedGradeControlNodeOutflow(fromNode);
             matrixSolver->addToRhs(n2, (double)xQ[n1]);
         }
     }
